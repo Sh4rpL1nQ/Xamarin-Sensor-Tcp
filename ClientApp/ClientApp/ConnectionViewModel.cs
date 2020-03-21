@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 
@@ -11,6 +12,7 @@ namespace ClientApp
     {
         private string host;
         private string port;
+        private Client client;
 
         public string Host
         {
@@ -26,17 +28,17 @@ namespace ClientApp
 
         public ConnectionViewModel()
         {
-            ConnectCommand = new Command(
-                execute: () => { ConnectAction(); },
-                canExecute: () => { return true; }
-                );
+            ConnectCommand = new Command (async () => {
+                await ConnectAction();
+                await Application.Current.MainPage.Navigation.PushAsync(new SelectionPage(client));
+            });
         }
 
         public ICommand ConnectCommand { get; }
 
-        public void ConnectAction()
+        public async Task ConnectAction()
         {
-
+            client = new Client();
         }
     }
 }

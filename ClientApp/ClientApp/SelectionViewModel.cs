@@ -11,5 +11,10 @@ namespace ClientApp
         {
 
         }
+
+        public SelectionViewModel(Client client)
+        {
+
+        }
     }
 }
