@@ -6,7 +6,42 @@
         xmlns:local="clr-namespace:ServerApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.DataContext>
+        <local:MainViewModel></local:MainViewModel>
+    </Window.DataContext>
     <Grid>
-        
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Top">
+                <Button Content="Start Server" Command="{Binding StartServerCommand}"></Button>
+                <ListBox Height="100" ItemsSource="{Binding BackLog}">
+
+                </ListBox>
+            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <DockPanel>
+                    <TextBlock FontSize="20" Background="LightBlue"></TextBlock>
+                    <TextBlock TextWrapping="Wrap">
+
+                    </TextBlock>
+                </DockPanel>
+                <DockPanel Grid.Column="1">
+                    <TextBlock FontSize="20" Background="LightBlue"></TextBlock>
+                    <TextBlock TextWrapping="Wrap">
+
+                    </TextBlock>
+                </DockPanel>
+                <DockPanel Grid.Column="2">
+                    <TextBlock FontSize="20" Background="LightBlue"></TextBlock>
+                    <TextBlock TextWrapping="Wrap">
+
+                    </TextBlock>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
     </Grid>
 </Window>
