@@ -11,7 +11,7 @@ using System.Windows.Threading;
 
 namespace ServerApp
 {
-    public class MainViewModel : PropertyChangedBase
+    public class MainViewModel : ViewModelBase
     {
         public Server Server { get; set; }
 

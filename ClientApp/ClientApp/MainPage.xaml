@@ -3,14 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:d="http://xamarin.com/schemas/2014/forms/design"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:ClientApp"
              mc:Ignorable="d"
              x:Class="ClientApp.MainPage">
-
-    <StackLayout>
-        <!-- Place new controls here -->
-        <Label Text="Welcome to Xamarin.Forms!" 
-           HorizontalOptions="Center"
-           VerticalOptions="CenterAndExpand" />
+    <ContentPage.BindingContext>
+        <local:ConnectionViewModel></local:ConnectionViewModel>
+    </ContentPage.BindingContext>
+    <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="20">
+        <StackLayout Orientation="Horizontal" VerticalOptions="Start" HorizontalOptions="Fill">
+            <Grid VerticalOptions="Fill" HorizontalOptions="FillAndExpand">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Label FontSize="Medium" VerticalOptions="Center" Text="Host"></Label>
+                <Entry VerticalOptions="Center" Grid.Column="1" Placeholder="192.168.178.22" Text="{Binding Host}"></Entry>
+                <Label FontSize="Medium" VerticalOptions="Center" Grid.Row="1" Text="Port"></Label>
+                <Entry VerticalOptions="Center" Grid.Row="1" Grid.Column="1" Placeholder="11000" Text="{Binding Port}"></Entry>
+            </Grid>
+        </StackLayout>
+        <StackLayout Orientation="Horizontal" VerticalOptions="CenterAndExpand">
+        </StackLayout>
+        <StackLayout Orientation="Horizontal" VerticalOptions="End" HorizontalOptions="FillAndExpand">
+            <Button Text="Connect" VerticalOptions="End" HorizontalOptions="FillAndExpand" Command="{Binding ConnectCommand}" />
+        </StackLayout>
     </StackLayout>
-
 </ContentPage>

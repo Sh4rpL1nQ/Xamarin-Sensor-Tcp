@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Threading;
 
-namespace ServerApp
+namespace Library
 {
     public class PropertyChangedBase : INotifyPropertyChanged
     {
@@ -11,13 +10,6 @@ namespace ServerApp
         private void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public virtual Dispatcher DispatcherObject { get; protected set; }
-
-        public PropertyChangedBase()
-        {
-            DispatcherObject = Dispatcher.CurrentDispatcher;
         }
 
         public bool RaisePropertyChanged<T>(ref T member, T val, [CallerMemberName] string propertyName = null)
