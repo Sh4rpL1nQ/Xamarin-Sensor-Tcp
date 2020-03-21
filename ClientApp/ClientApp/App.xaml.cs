@@ -10,7 +10,8 @@ namespace ClientApp
         {
             InitializeComponent();
 
-            MainPage = new NavigationPage(new MainPage());
+            MainPage = new NavigationPage(new ConnectionPage());
+            
         }
 
         protected override void OnStart()

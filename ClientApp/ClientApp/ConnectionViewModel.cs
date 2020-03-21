@@ -10,8 +10,8 @@ namespace ClientApp
 {
     public class ConnectionViewModel : PropertyChangedBase
     {
-        private string host;
-        private string port;
+        private string host = "192.168.178.22";
+        private string port = "11000";
         private Client client;
 
         public string Host
@@ -28,17 +28,24 @@ namespace ClientApp
 
         public ConnectionViewModel()
         {
-            ConnectCommand = new Command (async () => {
-                await ConnectAction();
-                await Application.Current.MainPage.Navigation.PushAsync(new SelectionPage(client));
-            });
+            ConnectCommand = new Command (async () => { await ConnectAction(); });
         }
 
         public ICommand ConnectCommand { get; }
 
         public async Task ConnectAction()
         {
-            client = new Client();
+            if (int.TryParse(port, out int intPort) && !string.IsNullOrEmpty(host))
+            {
+                client = new Client(host, intPort);
+                if (!client.Initiate())
+                {
+                    DependencyService.Get<IMessage>().LongAlert("Could not connect to the server: Wrong host or wrong port");
+                    return;
+                }
+
+                await Application.Current.MainPage.Navigation.PushAsync(new SelectionPage(client));
+            }  
         }
     }
 }
