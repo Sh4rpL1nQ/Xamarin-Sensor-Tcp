@@ -6,10 +6,18 @@
              mc:Ignorable="d"
              x:Class="ClientApp.SelectionPage" NavigationPage.HasBackButton="False" Title="Selection">
     <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Welcome to Xamarin.Forms!"
-                VerticalOptions="CenterAndExpand" 
-                HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
+        <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+            <ListView x:Name="RoleList" ItemsSource="{Binding Client.Roles}" VerticalOptions="Fill" HorizontalOptions="Fill">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <Button Text="{Binding RoleType}" IsEnabled="{Binding IsVisible}" 
+                                    Command="{Binding Source={x:Reference RoleList}, Path=BindingContext.SelectionCommand}" 
+                                    CommandParameter="{Binding}" BackgroundColor="AliceBlue"></Button>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

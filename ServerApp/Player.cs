@@ -30,7 +30,7 @@ namespace ServerApp
 
         public Socket Socket { get; }
 
-        public void SendRegistrationPackage(List<RoleType> initRoles)
+        public void SendRegistrationPackage(List<Role> initRoles)
         {
             var p = new Package(PackageType.Connected, "server");
             p.data.Add(Id);

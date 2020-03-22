@@ -1,11 +1,13 @@
 ﻿using Library;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ClientApp
 {
@@ -14,11 +16,15 @@ namespace ClientApp
         public Socket Master { get; set; }
         public string Id { get; set; }
 
+        public ObservableCollection<Role> Roles { get; set; }
+
         public Client(string host, int port)
         {
             Host = host;
 
             Port = port;
+
+            Roles = new ObservableCollection<Role>();
         }
 
         public string Host { get; set; }
@@ -56,8 +62,6 @@ namespace ClientApp
             return true;
         }
 
-        public event EventHandler SelectionChanged;
-        public event EventHandler InitialExecute;
         public event EventHandler ServerFull;
 
         public void Send(PackageType p, string message)
@@ -68,7 +72,7 @@ namespace ClientApp
             Master.Send(pack.ToBytes());
         }
 
-        public void DataIn()
+        public async void DataIn()
         {
             byte[] buffer;
             int readBytes;
@@ -82,7 +86,7 @@ namespace ClientApp
                     if (readBytes > 0)
                     {
                         Package p = new Package(buffer);
-                        DataManager(p);
+                        await DataManager(p);
                     }
                 }
                 catch (Exception)
@@ -94,23 +98,27 @@ namespace ClientApp
             }
         }
 
-        public void DataManager(Package p)
+        public async Task DataManager(Package p)
         {
             switch (p.packetType)
             {
-                case PackageType.Connected:
-                    Id = p.data[0].ToString();
-                    var roles = (bool[])p.data[1];
-                    var setup = Enum.GetValues(typeof(RoleType)).Cast<RoleType>().FirstOrDefault(x => roles[(int)x] == true);
-                    InitialExecute?.Invoke(this, new SelectedRoleEventArgs(setup, (List<RoleType>)p.data[1]));
+                case PackageType.Connected:                    
+                    await Task.Run(() =>
+                    {
+                        Id = p.data[0].ToString();
+                        foreach (var r in (List<Role>)p.data[1])
+                            Roles.Add(r);
+                    });
                     break;
-
                 case PackageType.Selected:
-                    SelectionChanged?.Invoke(this, new SelectedRoleEventArgs((RoleType)Enum.Parse(typeof(RoleType), p.data[0].ToString()), (List<RoleType>)p.data[1]));
+                    await Task.Run(() =>
+                    {
+                        Roles.FirstOrDefault(x => x.RoleType == (RoleType)Enum.Parse(typeof(RoleType), p.data[0].ToString())).IsVisible = false;
+                    });                    
                     break;
 
                 case PackageType.Disconnected:
-                    SelectionChanged?.Invoke(this, new SelectedRoleEventArgs((RoleType)Enum.Parse(typeof(RoleType), p.data[0].ToString()), (List<RoleType>)p.data[1]));
+                    Roles.FirstOrDefault(x => x.RoleType == (RoleType)Enum.Parse(typeof(RoleType), p.data[0].ToString())).IsVisible = true;
                     break;
 
                 case PackageType.ServerFull:

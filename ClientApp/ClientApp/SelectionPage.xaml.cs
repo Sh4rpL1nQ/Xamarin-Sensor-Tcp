@@ -21,5 +21,10 @@ namespace ClientApp
         {
             BindingContext = new SelectionViewModel(client);
         }
+
+        protected override bool OnBackButtonPressed()
+        {
+            return true;
+        }
     }
 }

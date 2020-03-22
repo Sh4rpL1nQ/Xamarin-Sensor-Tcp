@@ -29,6 +29,7 @@ namespace ClientApp
         public ConnectionViewModel()
         {
             ConnectCommand = new Command (async () => { await ConnectAction(); });
+
         }
 
         public ICommand ConnectCommand { get; }
@@ -38,6 +39,13 @@ namespace ClientApp
             if (int.TryParse(port, out int intPort) && !string.IsNullOrEmpty(host))
             {
                 client = new Client(host, intPort);
+
+                client.ServerFull += delegate
+                {
+                    DependencyService.Get<IMessage>().LongAlert("Could not connect to the server: Server is already full");
+                    return;
+                };
+
                 if (!client.Initiate())
                 {
                     DependencyService.Get<IMessage>().LongAlert("Could not connect to the server: Wrong host or wrong port");

@@ -19,11 +19,14 @@ namespace ServerApp
 
         private List<Player> players;
 
-        private List<RoleType> roleTypes;
+        private List<Role> roles;
 
         public Server()
         {
-            roleTypes = Enum.GetValues(typeof(RoleType)).Cast<RoleType>().ToList();
+            var roleTypes = Enum.GetValues(typeof(RoleType)).Cast<RoleType>().ToList();
+            roles = new List<Role>();
+
+            roleTypes.ForEach(x => roles.Add(new Role() { RoleType = x }));
         }
 
         public event EventHandler OnPlayerConnected;
@@ -47,9 +50,9 @@ namespace ServerApp
             {
                 serverSocket.Listen(0);
                 var player = new Player(serverSocket.Accept(), this);
-                if (players.Count < Enum.GetValues(typeof(RoleType)).Length)
+                if (players.Count < roles.Count)
                 {
-                    player.SendRegistrationPackage(roleTypes);
+                    player.SendRegistrationPackage(roles);
                     players.Add(player);
                     OnPlayerConnected?.Invoke(player, new EventArgs());
                 }                
@@ -84,6 +87,8 @@ namespace ServerApp
                 {
                     OnPlayerDisconnected?.Invoke(player, new EventArgs());
                     var p = new Package(PackageType.Disconnected, player.Id);
+
+                    roles.FirstOrDefault(x => x.RoleType == player.Role).IsVisible = true;
                     p.data.Add(player.Role.ToString());
 
                     players.Remove(player);
@@ -101,15 +106,15 @@ namespace ServerApp
             switch (p.packetType)
             {
                 case PackageType.Selected:
-                    var enumValue = (RoleType)Enum.Parse(typeof(RoleType), p.data[0].ToString());
+                    var enumValue = (RoleType) Enum.Parse(typeof(RoleType), p.data[0].ToString());
                     foreach (var c in players)
                     {
                         if (c.Id == p.senderId)
                             c.Role = enumValue;
 
-                        roleTypes.Remove(enumValue);
+                        roles.FirstOrDefault(x => x.RoleType == enumValue).IsVisible = false;
 
-                        p.data.Add(roleTypes);
+                        p.data.Add(roles);
                         c.Socket.Send(p.ToBytes());
                     }
                     break;
