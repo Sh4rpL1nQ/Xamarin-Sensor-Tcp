@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace ServerApp
 {
-    public class Player
+    public class Player : PropertyChangedBase
     {
-        private Thread thread;        
+        private Thread thread;
+        private float x, y, z;
 
         public Player(Socket socket, Server server)
         {
@@ -29,6 +30,24 @@ namespace ServerApp
         public RoleType Role { get; set; }
 
         public Socket Socket { get; }
+
+        public float X
+        {
+            get { return x; }
+            set { RaisePropertyChanged(ref x, value); }
+        }
+
+        public float Y
+        {
+            get { return y; }
+            set { RaisePropertyChanged(ref y, value); }
+        }
+
+        public float Z
+        {
+            get { return z; }
+            set { RaisePropertyChanged(ref z, value); }
+        }
 
         public void SendRegistrationPackage(List<Role> initRoles)
         {

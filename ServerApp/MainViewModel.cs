@@ -15,8 +15,6 @@ namespace ServerApp
     {
         public Server Server { get; set; }
 
-        public ObservableCollection<Player> Players { get; set; }
-
         public ObservableCollection<string> BackLog { get; set; }
 
         public MainViewModel()
@@ -27,22 +25,18 @@ namespace ServerApp
 
             BackLog = new ObservableCollection<string>();
 
-            Players = new ObservableCollection<Player>();
-
             StartServerCommand = new ActionCommand(StartServerAction);
         }
 
         private void Server_OnPlayerDisconnected(object sender, EventArgs e)
         {
             var player = sender as Player;
-            Players.Add(player);
             AddLog("Player disconnected: " + (sender as Player).Id);
         }
 
         private void Server_OnPlayerConnected(object sender, EventArgs e)
         {
             var player = sender as Player;
-            Players.Remove(player);
             AddLog("Player connected: " + (sender as Player).Id);
         }
 

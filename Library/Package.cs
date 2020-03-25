@@ -29,14 +29,21 @@ namespace Library
         {
             var formatter = new BinaryFormatter();
             var mem = new MemoryStream(bytes);
+            Package p = null;
+            try
+            {
+                p = (Package)formatter.Deserialize(mem);
+                data = p.data;
+                packetType = p.packetType;
+                senderId = p.senderId;
+            } catch (Exception e)
+            {
 
-            Package p = (Package)formatter.Deserialize(mem);
-
-            data = p.data;
-            packetType = p.packetType;
-            senderId = p.senderId;
-
-            mem.Close();
+            }
+            finally
+            {
+                mem.Close();
+            }
         }
 
         public byte[] ToBytes()

@@ -13,9 +13,10 @@ namespace ClientApp
 
         public SelectionViewModel()
         {
-            SelectionCommand = new Command((sender) =>
+            SelectionCommand = new Command(async (sender) =>
             {
                 Client.Send(PackageType.Selected, (sender as Role).RoleType.ToString());
+                await Application.Current.MainPage.Navigation.PushAsync(new SensorTransmissionPage(Client));
             });
         }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO.Packaging;
 using System.Linq;
 using System.Net;
@@ -17,7 +18,7 @@ namespace ServerApp
     {
         private Socket serverSocket;
 
-        private List<Player> players;
+        public ObservableCollection<Player> Players { get; set; }
 
         private List<Role> roles;
 
@@ -34,7 +35,7 @@ namespace ServerApp
 
         public void Start()
         {
-            players = new List<Player>();
+            Players = new ObservableCollection<Player>();
 
             serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
@@ -50,10 +51,10 @@ namespace ServerApp
             {
                 serverSocket.Listen(0);
                 var player = new Player(serverSocket.Accept(), this);
-                if (players.Count < roles.Count)
+                if (Players.Count < roles.Count)
                 {
                     player.SendRegistrationPackage(roles);
-                    players.Add(player);
+                    Players.Add(player);
                     OnPlayerConnected?.Invoke(player, new EventArgs());
                 }                
                 else
@@ -83,7 +84,7 @@ namespace ServerApp
                         DataManager(p);
                     }
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     OnPlayerDisconnected?.Invoke(player, new EventArgs());
                     var p = new Package(PackageType.Disconnected, player.Id);
@@ -91,10 +92,10 @@ namespace ServerApp
                     roles.FirstOrDefault(x => x.RoleType == player.Role).IsVisible = true;
                     p.data.Add(player.Role.ToString());
 
-                    players.Remove(player);
+                    Players.Remove(player);
 
-                    for (int i = 0; i < players.Count; i++)
-                        players[i].Socket.Send(p.ToBytes());
+                    for (int i = 0; i < Players.Count; i++)
+                        Players[i].Socket.Send(p.ToBytes());
 
                     break;
                 }
@@ -107,7 +108,7 @@ namespace ServerApp
             {
                 case PackageType.Selected:
                     var enumValue = (RoleType) Enum.Parse(typeof(RoleType), p.data[0].ToString());
-                    foreach (var c in players)
+                    foreach (var c in Players)
                     {
                         if (c.Id == p.senderId)
                             c.Role = enumValue;
@@ -117,6 +118,14 @@ namespace ServerApp
                         p.data.Add(roles);
                         c.Socket.Send(p.ToBytes());
                     }
+                    break;
+
+                case PackageType.Sensor:
+                    var split = p.data[0].ToString().Split('|');
+                    var target = Players.FirstOrDefault(x => x.Id == p.senderId);
+                    target.X = float.Parse(split[0], CultureInfo.InvariantCulture);
+                    target.Y = float.Parse(split[1], CultureInfo.InvariantCulture);
+                    target.Z = float.Parse(split[2], CultureInfo.InvariantCulture);
                     break;
             }
         }

@@ -9,6 +9,7 @@ namespace Library
     public enum PackageType
     {
         Connected,
+        Sensor,
         ServerFull,
         Selected,
         Disconnected
