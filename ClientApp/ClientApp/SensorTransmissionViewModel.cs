@@ -15,16 +15,17 @@ namespace ClientApp
         public SensorTransmissionViewModel(Client client) : this()
         {
             Client = client;
-            Accelerometer.Start(SensorSpeed.Game);
-            Accelerometer.ReadingChanged += Accelerometer_ReadingChanged;
+            OrientationSensor.Start(SensorSpeed.Game);
+            OrientationSensor.ReadingChanged += Accelerometer_ReadingChanged;
         }
 
-        private void Accelerometer_ReadingChanged(object sender, AccelerometerChangedEventArgs e)
+        private void Accelerometer_ReadingChanged(object sender, OrientationSensorChangedEventArgs e)
         {
             var data = e.Reading;
-            X = data.Acceleration.X;
-            Y = data.Acceleration.Y;
-            Z = data.Acceleration.Z;
+            var res = SystemConversion.FromQ2(data.Orientation);
+            X = res.X;
+            Y = res.Y;
+            Z = res.Z;
             Client.Send(PackageType.Sensor, string.Format("{0}|{1}|{2}", X, Y, Z));
         }
 

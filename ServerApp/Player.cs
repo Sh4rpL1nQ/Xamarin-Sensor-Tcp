@@ -14,12 +14,12 @@ namespace ServerApp
         private Thread thread;
         private float x, y, z;
 
-        public Player(Socket socket, Server server)
+        public Player(Socket socket, Action<object> server)
         {
             Socket = socket;
 
             Id = Guid.NewGuid().ToString();
-            thread = new Thread(server.DataIn);
+            thread = new Thread(server.Invoke);
             thread.Start(this);
         }
 

@@ -14,7 +14,7 @@ using Package = Library.Package;
 
 namespace ServerApp
 {
-    public class Server
+    public class Server : ViewModelBase
     {
         private Socket serverSocket;
 
@@ -27,11 +27,12 @@ namespace ServerApp
             var roleTypes = Enum.GetValues(typeof(RoleType)).Cast<RoleType>().ToList();
             roles = new List<Role>();
 
-            roleTypes.ForEach(x => roles.Add(new Role() { RoleType = x }));
+            roleTypes.ForEach(x => roles.Add(new Role() { RoleType = x }));  
         }
 
         public event EventHandler OnPlayerConnected;
         public event EventHandler OnPlayerDisconnected;
+        public event EventHandler OnSensorDataChanged;
 
         public void Start()
         {
@@ -50,7 +51,7 @@ namespace ServerApp
             while (true)
             {
                 serverSocket.Listen(0);
-                var player = new Player(serverSocket.Accept(), this);
+                var player = new Player(serverSocket.Accept(), DataIn);
                 if (Players.Count < roles.Count)
                 {
                     player.SendRegistrationPackage(roles);
@@ -76,30 +77,47 @@ namespace ServerApp
             {
                 try
                 {
-                    buffer = new byte[player.Socket.SendBufferSize];
-                    readBytes = player.Socket.Receive(buffer);
-                    if (readBytes > 0)
+                    if (SocketConnected(player.Socket))
                     {
-                        Package p = new Package(buffer);
-                        DataManager(p);
+                        buffer = new byte[player.Socket.SendBufferSize];
+                        readBytes = player.Socket.Receive(buffer);
+                        if (readBytes > 0)
+                        {
+                            Package p = new Package(buffer);
+                            DataManager(p);
+                        }
+                    }
+                    else
+                    {
+                        OnPlayerDisconnected?.Invoke(player, new EventArgs());
+                        var p = new Package(PackageType.Disconnected, player.Id);
+
+                        roles.FirstOrDefault(x => x.RoleType == player.Role).IsVisible = true;
+                        p.data.Add(player.Role.ToString());
+
+                        Players.Remove(player);
+
+                        for (int i = 0; i < Players.Count; i++)
+                            Players[i].Socket.Send(p.ToBytes());
+
+                        break;
                     }
                 }
                 catch (Exception e)
                 {
-                    OnPlayerDisconnected?.Invoke(player, new EventArgs());
-                    var p = new Package(PackageType.Disconnected, player.Id);
-
-                    roles.FirstOrDefault(x => x.RoleType == player.Role).IsVisible = true;
-                    p.data.Add(player.Role.ToString());
-
-                    Players.Remove(player);
-
-                    for (int i = 0; i < Players.Count; i++)
-                        Players[i].Socket.Send(p.ToBytes());
-
                     break;
                 }
             }
+        }
+
+        private bool SocketConnected(Socket s)
+        {
+            bool part1 = s.Poll(1000, SelectMode.SelectRead);
+            bool part2 = (s.Available == 0);
+            if (part1 & part2)
+                return false;
+            
+            return true;
         }
 
         public void DataManager(Package p)
@@ -118,14 +136,16 @@ namespace ServerApp
                         p.data.Add(roles);
                         c.Socket.Send(p.ToBytes());
                     }
+
                     break;
 
                 case PackageType.Sensor:
                     var split = p.data[0].ToString().Split('|');
                     var target = Players.FirstOrDefault(x => x.Id == p.senderId);
-                    target.X = float.Parse(split[0], CultureInfo.InvariantCulture);
-                    target.Y = float.Parse(split[1], CultureInfo.InvariantCulture);
-                    target.Z = float.Parse(split[2], CultureInfo.InvariantCulture);
+                    target.X = float.Parse(split[0].Replace(",", "."), CultureInfo.InvariantCulture);
+                    target.Y = float.Parse(split[1].Replace(",", "."), CultureInfo.InvariantCulture);
+                    target.Z = float.Parse(split[2].Replace(",", "."), CultureInfo.InvariantCulture);
+                    OnSensorDataChanged?.Invoke(target.Id, new SensorEventArgs(target.X, target.Y, target.Z));
                     break;
             }
         }

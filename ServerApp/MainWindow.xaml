@@ -5,11 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ServerApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Window.DataContext>
-        <local:MainViewModel></local:MainViewModel>
-    </Window.DataContext>
-    <Grid>
+        Title="MainWindow" Height="450" Width="900">
+    <Grid x:Name="root">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <Button Content="Start Server" Command="{Binding StartServerCommand}"></Button>
@@ -17,29 +14,246 @@
 
                 </ListBox>
             </StackPanel>
-            <ItemsControl ItemsSource="{Binding Server.Players}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel></WrapPanel>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <DockPanel>
-                            <TextBlock DockPanel.Dock="Top" Background="AliceBlue" Text="{Binding Id}"></TextBlock>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"></RowDefinition>
-                                    <RowDefinition Height="*"></RowDefinition>
-                                    <RowDefinition Height="*"></RowDefinition>
-                                </Grid.RowDefinitions>
-                                
-                                
-                            </Grid>
-                        </DockPanel>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <StackPanel Orientation="Horizontal">
+                <DockPanel Width="300">
+                <TextBlock DockPanel.Dock="Top" Background="AliceBlue" Text="{Binding Players[0].Id}"></TextBlock>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top">
+                        <TextBlock Text="{Binding Players[0].X, StringFormat=X: {0}}"></TextBlock>
+                        <TextBlock Text="{Binding Players[0].Y, StringFormat=Y: {0}}"></TextBlock>
+                        <TextBlock Text="{Binding Players[0].Z, StringFormat=Z: {0}}"></TextBlock>
+                    </StackPanel>
+                    <Grid Background="Green" VerticalAlignment="Stretch">
+                        <Viewport3D Margin="4,4,4,4" VerticalAlignment="Stretch" x:Name="c">
+                            <ModelVisual3D>
+                                <ModelVisual3D.Content>
+                                    <Model3DGroup>
+                                        <!-- Lights -->
+                                        <AmbientLight Color="Gray" />
+                                        <DirectionalLight Color="Gray" Direction="1,-2,-3" />
+                                        <DirectionalLight Color="Gray" Direction="-1,2,3" />
+
+                                        <GeometryModel3D x:Name="cube1">
+                                            <GeometryModel3D.Geometry>
+                                                <!-- Cube -->
+                                                <MeshGeometry3D 
+                                    Positions="
+                                      -1,-1,-1   1,-1,-1   1,-1, 1  -1,-1, 1
+                                      -1,-1, 1   1,-1, 1   1, 1, 1  -1, 1, 1
+                                       1,-1, 1   1,-1,-1   1, 1,-1   1, 1, 1
+                                       1, 1, 1   1, 1,-1  -1, 1,-1  -1, 1, 1
+                                      -1,-1, 1  -1, 1, 1  -1, 1,-1  -1,-1,-1 
+                                      -1,-1,-1  -1, 1,-1   1, 1,-1   1,-1,-1
+                                      "
+                                    TriangleIndices="
+                                       0  1  2     2  3  0
+                                       4  5  6     6  7  4
+                                       8  9 10    10 11  8
+                                      12 13 14    14 15 12
+                                      16 17 18    18 19 16
+                                      20 21 22    22 23 20
+                                      " />
+                                            </GeometryModel3D.Geometry>
+
+                                            <GeometryModel3D.Material>
+                                                <DiffuseMaterial Brush="Blue" />
+                                            </GeometryModel3D.Material>
+                                        </GeometryModel3D>
+                                    </Model3DGroup>
+                                </ModelVisual3D.Content>
+                            </ModelVisual3D>
+
+                            <Viewport3D.Camera>
+                                <PerspectiveCamera 
+                  Position = "1.5, 2, 3"
+                  LookDirection = "-1.5, -2, -3"
+                  UpDirection = "0, 1, 0"
+                  FieldOfView = "60">
+                                    <PerspectiveCamera.Transform>
+                                        <Transform3DGroup>
+                                            <RotateTransform3D>
+                                                <RotateTransform3D.Rotation>
+                                                    <AxisAngleRotation3D
+                                      Axis="0 1 0" 
+                                      Angle="{Binding ElementName=hscroll, Path=Value}" />
+                                                </RotateTransform3D.Rotation>
+                                            </RotateTransform3D>
+                                            <RotateTransform3D>
+                                                <RotateTransform3D.Rotation>
+                                                    <AxisAngleRotation3D
+                                      Axis="1 0 0" 
+                                      Angle="{Binding ElementName=vscroll, Path=Value}" />
+                                                </RotateTransform3D.Rotation>
+                                            </RotateTransform3D>
+                                        </Transform3DGroup>
+                                    </PerspectiveCamera.Transform>
+                                </PerspectiveCamera>
+                            </Viewport3D.Camera>
+                        </Viewport3D>
+                    </Grid>
+
+                </DockPanel>
+            </DockPanel>
+                <DockPanel Width="300">
+                    <TextBlock DockPanel.Dock="Top" Background="AliceBlue" Text="{Binding Players[1].Id}"></TextBlock>
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top">
+                            <TextBlock Text="{Binding Players[1].X, StringFormat=X: {0}}"></TextBlock>
+                            <TextBlock Text="{Binding Players[1].Y, StringFormat=Y: {0}}"></TextBlock>
+                            <TextBlock Text="{Binding Players[1].Z, StringFormat=Z: {0}}"></TextBlock>
+                        </StackPanel>
+                        <Grid Background="Green" VerticalAlignment="Stretch">
+                            <Viewport3D Margin="4,4,4,4" VerticalAlignment="Stretch">
+                                <ModelVisual3D>
+                                    <ModelVisual3D.Content>
+                                        <Model3DGroup>
+                                            <!-- Lights -->
+                                            <AmbientLight Color="Gray" />
+                                            <DirectionalLight Color="Gray" Direction="1,-2,-3" />
+                                            <DirectionalLight Color="Gray" Direction="-1,2,3" />
+
+                                            <GeometryModel3D x:Name="cube2">
+                                                <GeometryModel3D.Geometry>
+                                                    <!-- Cube -->
+                                                    <MeshGeometry3D 
+                                    Positions="
+                                      -1,-1,-1   1,-1,-1   1,-1, 1  -1,-1, 1
+                                      -1,-1, 1   1,-1, 1   1, 1, 1  -1, 1, 1
+                                       1,-1, 1   1,-1,-1   1, 1,-1   1, 1, 1
+                                       1, 1, 1   1, 1,-1  -1, 1,-1  -1, 1, 1
+                                      -1,-1, 1  -1, 1, 1  -1, 1,-1  -1,-1,-1 
+                                      -1,-1,-1  -1, 1,-1   1, 1,-1   1,-1,-1
+                                      "
+                                    TriangleIndices="
+                                       0  1  2     2  3  0
+                                       4  5  6     6  7  4
+                                       8  9 10    10 11  8
+                                      12 13 14    14 15 12
+                                      16 17 18    18 19 16
+                                      20 21 22    22 23 20
+                                      " />
+                                                </GeometryModel3D.Geometry>
+
+                                                <GeometryModel3D.Material>
+                                                    <DiffuseMaterial Brush="Blue" />
+                                                </GeometryModel3D.Material>
+                                            </GeometryModel3D>
+                                        </Model3DGroup>
+                                    </ModelVisual3D.Content>
+                                </ModelVisual3D>
+
+                                <Viewport3D.Camera>
+                                    <PerspectiveCamera 
+                  Position = "1.5, 2, 3"
+                  LookDirection = "-1.5, -2, -3"
+                  UpDirection = "0, 1, 0"
+                  FieldOfView = "60">
+                                        <PerspectiveCamera.Transform>
+                                            <Transform3DGroup>
+                                                <RotateTransform3D>
+                                                    <RotateTransform3D.Rotation>
+                                                        <AxisAngleRotation3D
+                                      Axis="0 1 0" 
+                                      Angle="{Binding ElementName=hscroll, Path=Value}" />
+                                                    </RotateTransform3D.Rotation>
+                                                </RotateTransform3D>
+                                                <RotateTransform3D>
+                                                    <RotateTransform3D.Rotation>
+                                                        <AxisAngleRotation3D
+                                      Axis="1 0 0" 
+                                      Angle="{Binding ElementName=vscroll, Path=Value}" />
+                                                    </RotateTransform3D.Rotation>
+                                                </RotateTransform3D>
+                                            </Transform3DGroup>
+                                        </PerspectiveCamera.Transform>
+                                    </PerspectiveCamera>
+                                </Viewport3D.Camera>
+                            </Viewport3D>
+                        </Grid>
+
+                    </DockPanel>
+                </DockPanel>
+                <DockPanel Width="300">
+                    <TextBlock DockPanel.Dock="Top" Background="AliceBlue" Text="{Binding Players[2].Id}"></TextBlock>
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top">
+                            <TextBlock Text="{Binding Players[2].X, StringFormat=X: {0}}"></TextBlock>
+                            <TextBlock Text="{Binding Players[2].Y, StringFormat=Y: {0}}"></TextBlock>
+                            <TextBlock Text="{Binding Players[2].Z, StringFormat=Z: {0}}"></TextBlock>
+                        </StackPanel>
+                        <Grid Background="Green" VerticalAlignment="Stretch">
+                            <Viewport3D Margin="4,4,4,4" VerticalAlignment="Stretch">
+                                <ModelVisual3D>
+                                    <ModelVisual3D.Content>
+                                        <Model3DGroup>
+                                            <!-- Lights -->
+                                            <AmbientLight Color="Gray" />
+                                            <DirectionalLight Color="Gray" Direction="1,-2,-3" />
+                                            <DirectionalLight Color="Gray" Direction="-1,2,3" />
+
+                                            <GeometryModel3D x:Name="cube3">
+                                                <GeometryModel3D.Geometry>
+                                                    <!-- Cube -->
+                                                    <MeshGeometry3D 
+                                    Positions="
+                                      -1,-1,-1   1,-1,-1   1,-1, 1  -1,-1, 1
+                                      -1,-1, 1   1,-1, 1   1, 1, 1  -1, 1, 1
+                                       1,-1, 1   1,-1,-1   1, 1,-1   1, 1, 1
+                                       1, 1, 1   1, 1,-1  -1, 1,-1  -1, 1, 1
+                                      -1,-1, 1  -1, 1, 1  -1, 1,-1  -1,-1,-1 
+                                      -1,-1,-1  -1, 1,-1   1, 1,-1   1,-1,-1
+                                      "
+                                    TriangleIndices="
+                                       0  1  2     2  3  0
+                                       4  5  6     6  7  4
+                                       8  9 10    10 11  8
+                                      12 13 14    14 15 12
+                                      16 17 18    18 19 16
+                                      20 21 22    22 23 20
+                                      " />
+                                                </GeometryModel3D.Geometry>
+
+                                                <GeometryModel3D.Material>
+                                                    <DiffuseMaterial Brush="Blue" />
+                                                </GeometryModel3D.Material>
+                                            </GeometryModel3D>
+                                        </Model3DGroup>
+                                    </ModelVisual3D.Content>
+                                </ModelVisual3D>
+
+                                <Viewport3D.Camera>
+                                    <PerspectiveCamera 
+                  Position = "1.5, 2, 3"
+                  LookDirection = "-1.5, -2, -3"
+                  UpDirection = "0, 1, 0"
+                  FieldOfView = "60">
+                                        <PerspectiveCamera.Transform>
+                                            <Transform3DGroup>
+                                                <RotateTransform3D>
+                                                    <RotateTransform3D.Rotation>
+                                                        <AxisAngleRotation3D
+                                      Axis="0 1 0" 
+                                      Angle="{Binding ElementName=hscroll, Path=Value}" />
+                                                    </RotateTransform3D.Rotation>
+                                                </RotateTransform3D>
+                                                <RotateTransform3D>
+                                                    <RotateTransform3D.Rotation>
+                                                        <AxisAngleRotation3D
+                                      Axis="1 0 0" 
+                                      Angle="{Binding ElementName=vscroll, Path=Value}" />
+                                                    </RotateTransform3D.Rotation>
+                                                </RotateTransform3D>
+                                            </Transform3DGroup>
+                                        </PerspectiveCamera.Transform>
+                                    </PerspectiveCamera>
+                                </Viewport3D.Camera>
+                            </Viewport3D>
+                        </Grid>
+
+                    </DockPanel>
+                </DockPanel>
+            </StackPanel>
+            
         </DockPanel>
     </Grid>
 </Window>

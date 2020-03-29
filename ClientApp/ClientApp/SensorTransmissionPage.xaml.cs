@@ -19,7 +19,9 @@ namespace ClientApp
 
         public SensorTransmissionPage(Client client) : this()
         {
-            BindingContext = new SensorTransmissionViewModel(client);
+            var sensor = new SensorTransmissionViewModel(client);
+            
+            BindingContext = sensor;
         }
 
         protected override bool OnBackButtonPressed()
